@@ -1,13 +1,11 @@
-package com.darealreally.smartac.ui.home.components
+package com.darealreally.smartac.ui.components
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,41 +16,49 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.darealreally.smartac.R
+import com.darealreally.smartac.data.TestData
+import com.darealreally.smartac.ui.AppTheme
+import com.darealreally.smartac.ui.Theme
 import com.darealreally.smartac.ui.theme.SmartACTheme
 
 @Composable
 fun BottomControls(
     isTurnedOn: Boolean = true,
-    isCoolOn: Boolean = true,
-    isFanOn: Boolean = true,
     toggleOn: () -> Unit = {},
     toggleCool: () -> Unit = {},
-    toggleFan: () -> Unit = {}
+    toggleFan: () -> Unit = {},
+    appTheme: AppTheme = TestData.appThemeInactive
 ) {
     // UI
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
+
+        // Col 1: POWER
         ControlButton(
             iconId = R.drawable.ic_power,
-            color = MaterialTheme.colors.onPrimary,
-            backgroundColor = MaterialTheme.colors.onPrimary,
+            color = appTheme.onPrimary,
+            backgroundColor = appTheme.background,
             enabled = true,
             onClick = toggleOn
         )
+
+        // Col 2: COOL
         ControlButton(
             iconId = R.drawable.ic_cool,
-            color = MaterialTheme.colors.onPrimary,
-            backgroundColor = MaterialTheme.colors.onPrimary,
-            enabled = true,
+            color = appTheme.onPrimary,
+            backgroundColor = appTheme.background,
+            enabled = isTurnedOn && appTheme.theme == Theme.Cold,
             onClick = toggleCool
         )
+
+        // Col 3: FAN
         ControlButton(
             iconId = R.drawable.ic_fan,
-            color = MaterialTheme.colors.onPrimary,
-            backgroundColor = MaterialTheme.colors.onPrimary,
-            enabled = true,
+            color = appTheme.onPrimary,
+            backgroundColor = appTheme.background,
+            enabled = isTurnedOn,
             onClick = toggleFan
         )
     }
@@ -62,8 +68,8 @@ fun BottomControls(
 @Composable
 fun ControlButton(
     iconId: Int = R.drawable.ic_cool,
-    color: Color = MaterialTheme.colors.onPrimary,
-    backgroundColor: Color = MaterialTheme.colors.onPrimary,
+    color: Color = TestData.appThemeInactive.onPrimary,
+    backgroundColor: Color = TestData.appThemeInactive.background,
     enabled: Boolean = true,
     onClick: () -> Unit = {}
 ) {
@@ -73,7 +79,9 @@ fun ControlButton(
             .size(70.dp)
             .clip(CircleShape)
             .background(
-                backgroundColor.copy(alpha = 0.1F)
+                backgroundColor.copy(
+                    alpha = if (enabled) 0.5F else 0.1F
+                )
             )
             .border(
                 width = 0.5.dp,
@@ -90,7 +98,8 @@ fun ControlButton(
         Icon(
             painter = painterResource(id = iconId),
             contentDescription = null,
-            tint = color
+            tint = color,
+            modifier = Modifier.fillMaxSize(0.8F)
         )
     }
 }
@@ -109,10 +118,34 @@ fun BottomControlsPreview() {
     }
 }
 
-@Preview
+@Preview(name = "Cold")
+@Composable
+fun ControlButtonColdPreview() {
+    SmartACTheme {
+        ControlButton(
+            color = TestData.appThemeCold.onPrimary,
+            backgroundColor = TestData.appThemeCold.background
+        )
+    }
+}
+
+@Preview(name = "Hot")
+@Composable
+fun ControlButtonHotPreview() {
+    SmartACTheme {
+        ControlButton(
+            color = TestData.appThemeHot.onPrimary,
+            backgroundColor = TestData.appThemeHot.background
+        )
+    }
+}
+
+@Preview(name = "Inactive")
 @Composable
 fun ControlButtonPreview() {
     SmartACTheme {
-        ControlButton()
+        ControlButton(
+            enabled = false
+        )
     }
 }

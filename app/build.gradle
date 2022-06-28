@@ -60,7 +60,13 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
 
-    // Windows Inset
+    // Windows Inset and Controller
     def acc_version = "0.20.3"
     implementation "com.google.accompanist:accompanist-insets:$acc_version"
+    implementation "com.google.accompanist:accompanist-systemuicontroller:$acc_version"
+}
+
+// opt-in is experimental
+kotlin.sourceSets.all {
+    languageSettings.optIn("kotlin.RequiresOptIn")
 }
