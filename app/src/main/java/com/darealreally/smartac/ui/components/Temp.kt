@@ -1,6 +1,7 @@
 package com.darealreally.smartac.ui.components
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
@@ -16,7 +17,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.drawscope.DrawStyle
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -145,7 +151,8 @@ fun TempSlider(
             .height(maxHeightDp)
             .clip(RoundedCornerShape(100))
             .background(
-                color.copy(alpha = if (isTurnedOn) 0.4F else 0.1F))
+                color.copy(alpha = if (isTurnedOn) 0.4F else 0.1F)
+            )
             .draggable(
                 orientation = Orientation.Vertical,
                 state = rememberDraggableState { amount ->
@@ -161,12 +168,52 @@ fun TempSlider(
             .alpha(if (isTurnedOn) 1F else 0.5F),
         contentAlignment = Alignment.BottomCenter
     ) {
-        Box(
+        MeniscusFill(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(with(LocalDensity.current) { offsetX.toDp() })
-                .background(color.copy(alpha = 0.7F))
+                .scale(1.5F),
+            color = color.copy(alpha = 0.7F)
         )
+    }
+}
+
+@Composable
+fun MeniscusFill(
+    modifier: Modifier = Modifier,
+    color: Color = TestData.appThemeCold.onPrimary
+) {
+    Canvas(modifier = modifier) {
+        val fillPath = Path().apply {
+            val (width, height) = size
+
+            val p1 = Offset.Zero
+            val p2 = Offset(0F, height)
+            val p3 = Offset(width, height)
+            val p4 = Offset(width, 0F)
+            val p5 = Offset(0.5F * width, 40F)
+
+            moveTo(p2.x, p2.y)
+            lineTo(p3.x, p3.y)
+            lineTo(p4.x, p4.y)
+            lineTo(p5.x, p5.y)
+            lineTo(p1.x, p1.y)
+            lineTo(p2.x, p2.y)
+        }
+
+        this.drawIntoCanvas {
+            it.drawOutline(
+                outline = Outline.Generic(fillPath),
+                Paint().apply {
+                    this.color = color
+                    style = PaintingStyle.Fill
+                    strokeCap = StrokeCap.Round
+                    strokeJoin = StrokeJoin.Round
+                    pathEffect = PathEffect.cornerPathEffect(100F)
+                    isAntiAlias = true
+                }
+            )
+        }
     }
 }
 
@@ -176,6 +223,19 @@ fun TempSlider(
 /**
  * Preview Section
  */
+@Preview
+@Composable
+fun MeniscusFillPreview() {
+    SmartACTheme {
+        MeniscusFill(
+            modifier = Modifier
+                .width(500.dp)
+                .height(50.dp)
+                .padding(10.dp)
+        )
+    }
+}
+
 @Preview(name = "Inactive")
 @Composable
 fun TempDisplayPreview() {
